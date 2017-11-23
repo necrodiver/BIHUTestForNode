@@ -1,12 +1,12 @@
 ﻿var helper = {};
 helper.pwd = function (val) {
-    if (!/^[A-Za-z\.0-9]{4,20}/.test(val))
-        return false;
+    // if (!/^[A-Za-z\.0-9]{4,20}/.test(val))
+    //     return false;
     return true;
 };
 helper.bihuEmail = function (val) {
-    if (!/^[0-9a-zA-Z]{2,20}\@91bihu\.com/.test(val))
-        return false;
+    // if (!/^[0-9a-zA-Z]{2,20}\@91bihu\.com/.test(val))
+    //     return false;
     return true;
 };
 
