@@ -4,7 +4,8 @@ const bcrypt = require('bcrypt');
 const checkLogin = require('../middlewares/checklogin').checkLogin;
 const checkNotLogin = require('../middlewares/checklogin').checkNotLogin;
 const strVerify = require('../middlewares/checkstr');
-
+const users = require('../operate/usersoperate');
+const aesHelper = require('../middlewares/aeshelper');
 
 router.get('/', function (req, res, next) {
     res.redirect('/home/index');
@@ -21,7 +22,6 @@ router.post('/login', checkNotLogin, function (req, res, next) {
     var userName = req.body.Email;
     var pwd = req.body.Pwd;
     var readMe = req.body.ReadMe;
-
     var msgModel = {
         msgTitle: '登录操作',
         msgStatus: false,
@@ -40,13 +40,11 @@ router.post('/login', checkNotLogin, function (req, res, next) {
         return res.json(msgModel);
     }
 
-    bcrypt.genSalt(12, function (err, salt) {
-        if (err) return next(err);
-        bcrypt.hash(pwd, salt, function (err, hash) {
-            if (err) return next(err);
-            var pwded = hash;
-        })
-    })
+    var pwdEncrypted = aesHelper.aesEncrypt(pwd);
+    console.log('加密后字符串：',pwdEncrypted);
+    var pwdDeEncrypted=aesHelper.aesUnEncrypt(pwdEncrypted);
+    console.log('解密字符串：',pwdDeEncrypted);
+    
     res.send('登录');
 });
 
