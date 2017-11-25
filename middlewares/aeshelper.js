@@ -10,14 +10,6 @@ exports.aesEncrypt = function (str) {
   crypted += cipher.final(config.aes.cipherEncoding);
   crypted = new Buffer(crypted, config.aes.cipherEncoding).toString(config.aes.decipherEncoding);
   return crypted;
-
-  // const cipherChunks = [];
-  // const cipher = crypto.createCipheriv(config.aes.algorithm, config.aes.key, config.aes.iv);
-  // cipher.setAutoPadding(true);
-  // cipherChunks.push(cipher.update(str, config.aes.clearEncoding, config.aes.cipherEncoding));
-  // cipherChunks.push(cipher.final(config.aes.cipherEncoding));
-  // const crypted = cipherChunks.join('');
-  // return crypted;
 }
 /**
  * aes 256位解密
