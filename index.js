@@ -7,7 +7,6 @@ const config = require('config-lite')(__dirname);
 const routes = require('./routes');
 const pkg = require('./package');
 const bodyParser=require('body-parser');
-
 const app = express();
 
 // 设置模板目录
