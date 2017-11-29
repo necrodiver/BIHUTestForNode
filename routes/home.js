@@ -10,13 +10,17 @@ router.get('/', function (req, res, next) {
 });
 
 router.get('/index', function (req, res, next) {
+    let isLogin = false;
+    if (req.session.user) {
+        isLogin = true;
+    }
     res.render('index', {
         title: '首页',
-        isLogin: false
+        isLogin: isLogin
     });
 })
 
-router.post('/login', checkNotLogin, function (req, res, next) {
+router.post('/signin', checkNotLogin, function (req, res, next) {
     let userName = req.body.Email;
     let pwd = req.body.Pwd;
     let readMe = req.body.ReadMe;
@@ -65,8 +69,10 @@ router.post('/login', checkNotLogin, function (req, res, next) {
 
 });
 
-router.post('/logout', checkLogin, function (req, res, next) {
-    res.send('登出');
+router.get('/signout', checkLogin, function (req, res, next) {
+    req.session.user = null;
+    req.flash('success', '登出成功');
+    res.redirect('/home/index');
 });
 
 module.exports = router;

@@ -76,7 +76,7 @@
                     return helper.toolTipBox("密码格式不正确");
                 var req = $.ajax({
                     type: 'POST',
-                    url: '/home/login',
+                    url: '/home/signin',
                     data: this.User,
                     dataType: "JSON",
                     cache: false,
@@ -97,6 +97,8 @@
                     if (res.MsgStatus) {
                         helper.toolTipBox('登录成功');
                         console.log(res.MsgContent);
+                        _self.isLogin=true;
+                        bindLogin();
                         window.location.reload();
                     }
 
