@@ -1,6 +1,6 @@
 const linksequelize = require('../lib/linkmysql').linksequelize;
 const usersModel = require('../models/users');
-const Sequelize =require('sequelize');
+const Sequelize = require('sequelize');
 
 const Users = usersModel(linksequelize, Sequelize);
 
@@ -31,6 +31,10 @@ exports.addUsers = function (users) {
         Users.close();
     });
 }
+/**
+ * 获取所有用户
+ * @param {*} next 
+ */
 exports.getAllList = function (next) {
     Users.findAll().then(function (userList) {
         next(userList);
@@ -39,20 +43,19 @@ exports.getAllList = function (next) {
         throw new Error(err);
     });
 }
+/**
+ * 获取符合user条件的用户列表
+ * @param {*user条件} user 
+ */
 exports.getList = function (user) {
-    Users.findAll({
+    return Users.findAll({
         where: user
-    }).then(function (userList) {
-
-     }).catch(function (err) {
-        console.log(err);
-        throw new Error(err);
     });
 }
-exports.getPageList=function(leftNum,lengthNum){
-    Users.findAll({ offset:leftNum, limit: lengthNum }).then(function(userList){
-        
-    }).catch(function(err){
+exports.getPageList = function (leftNum, lengthNum) {
+    Users.findAll({ offset: leftNum, limit: lengthNum }).then(function (userList) {
+
+    }).catch(function (err) {
         console.log(err);
         throw new Error(err);
     });

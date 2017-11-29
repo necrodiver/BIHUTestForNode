@@ -1,9 +1,9 @@
 module.exports = {
     port: 3000,
     session: {
-      secret: 'amsdb',
-      key: 'amsdb',
-      maxAge: 2592000000
+      secret: 'sixthrhapsody', //session签名
+      key: 'sixthrhapsody', //返回客户端的key的名称，默认为connect.sid,也可以自己设置
+      maxAge: 1200000 //session过期时间(单位:ms)
     },
     mysql:{
       database:'bh_amsdb',
@@ -13,10 +13,10 @@ module.exports = {
       port:3306
     },
     aes:{
-      algorithm:'aes-256-cbc',
-      key:`)O[NB]6,YF}+efcaj{+oESb9d8>Z'e9M`,
-      iv:'L+\\~f4,Ir)b$=pkf',
-      clearEncoding:'utf8',
+      algorithm:'aes-256-cbc',//加密规则
+      key:`)O[NB]6,YF}+efcaj{+oESb9d8>Z'e9M`,//加密密钥
+      iv:'L+\\~f4,Ir)b$=pkf',//加密向量
+      clearEncoding:'utf8',//加密格式
       cipherEncoding:'binary',
       declearEncoding:'utf8',
       decipherEncoding:'base64'

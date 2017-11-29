@@ -95,7 +95,8 @@
                         return helper.toolTipBox(res.MsgContent);
                     }
                     if (res.MsgStatus) {
-                        helper.toolTipBox(res.MsgContent);
+                        helper.toolTipBox('登录成功');
+                        console.log(res.MsgContent);
                         window.location.reload();
                     }
 

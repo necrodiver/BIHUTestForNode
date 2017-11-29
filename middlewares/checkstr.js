@@ -12,7 +12,7 @@ module.exports = {
         if (!pwd) {
             return '登录密码不能为空!';
         }
-        if (!/^[A-Za-z\.0-9]{4,20}/.test(val)) {
+        if (!/^[A-Za-z\.0-9]{4,20}/.test(pwd)) {
             return '登录密码格式不正确';
         }
         return null;

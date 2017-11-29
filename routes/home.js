@@ -1,12 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcrypt');
 const checkLogin = require('../middlewares/checklogin').checkLogin;
 const checkNotLogin = require('../middlewares/checklogin').checkNotLogin;
 const strVerify = require('../middlewares/checkstr');
 const users = require('../operate/usersoperate');
 const aesHelper = require('../middlewares/aeshelper');
-
 router.get('/', function (req, res, next) {
     res.redirect('/home/index');
 });
@@ -19,15 +17,15 @@ router.get('/index', function (req, res, next) {
 })
 
 router.post('/login', checkNotLogin, function (req, res, next) {
-    var userName = req.body.Email;
-    var pwd = req.body.Pwd;
-    var readMe = req.body.ReadMe;
-    var msgModel = {
-        msgTitle: '登录操作',
-        msgStatus: false,
-        msgContent: ''
+    let userName = req.body.Email;
+    let pwd = req.body.Pwd;
+    let readMe = req.body.ReadMe;
+    let msgModel = {
+        MsgTitle: '登录操作',
+        MsgStatus: false,
+        MsgContent: ''
     };
-    var msg = '';
+    let msg = '';
 
     msg = strVerify.userNameVerify(userName);
     if (msg) {
@@ -40,12 +38,30 @@ router.post('/login', checkNotLogin, function (req, res, next) {
         return res.json(msgModel);
     }
 
-    var pwdEncrypted = aesHelper.aesEncrypt(pwd);
-    console.log('加密后字符串：',pwdEncrypted);
-    var pwdDeEncrypted=aesHelper.aesUnEncrypt(pwdEncrypted);
-    console.log('解密字符串：',pwdDeEncrypted);
-    
-    res.send('登录');
+    let pwdEncrypted = aesHelper.aesEncrypt(pwd);
+    let user = {
+        Email: userName,
+        Pwd: pwdEncrypted
+    };
+    users.getList(user).then(function (userlist) {
+        console.log('查询的用户数据', userlist);
+        if (userlist == undefined || userlist.length == 0) {
+            msgModel.MsgStatus = false;
+            msgModel.MsgContent = "当前登录名或密码错误，请重新输入";
+        }
+        else if (userlist.length == 1) {
+            let userModel = userlist[0];
+            delete userModel.Pwd;
+            msgModel.MsgStatus = true;
+            msgModel.MsgContent = userModel;
+        }
+        else {
+            msgModel.MsgStatus = false;
+            msgModel.MsgContent = '查询失败，数据错误！请检查数据库内容是否符合';
+        }
+        return res.json(msgModel);
+    });
+
 });
 
 router.post('/logout', checkLogin, function (req, res, next) {
