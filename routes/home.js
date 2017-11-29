@@ -52,6 +52,7 @@ router.post('/login', checkNotLogin, function (req, res, next) {
         else if (userlist.length == 1) {
             let userModel = userlist[0];
             delete userModel.Pwd;
+            req.session.user = userModel;//只有这里是保存用户信息
             msgModel.MsgStatus = true;
             msgModel.MsgContent = userModel;
         }
@@ -60,7 +61,7 @@ router.post('/login', checkNotLogin, function (req, res, next) {
             msgModel.MsgContent = '查询失败，数据错误！请检查数据库内容是否符合';
         }
         return res.json(msgModel);
-    });
+    }).catch(next);
 
 });
 
