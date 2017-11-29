@@ -4,12 +4,22 @@ const checkLogin = require('../middlewares/checklogin').checkLogin;
 const checkNotLogin = require('../middlewares/checklogin').checkNotLogin;
 const strVerify = require('../middlewares/checkstr');
 const users = require('../operate/usersoperate');
+const roles = require('../operate/rolesoperate');
 const aesHelper = require('../middlewares/aeshelper');
 router.get('/', function (req, res, next) {
     res.redirect('/home/index');
 });
 
 router.get('/index', function (req, res, next) {
+    roles.getAllList().then(function (roleList) {
+        if (roleList != undefined && roleList.length > 0) {
+            req.session.roleList == roleList;
+        }else{
+            throw new Error('获取权限列表失败！');
+            next();
+        }
+    }).catch(next);
+
     let isLogin = false;
     if (req.session.user) {
         isLogin = true;
