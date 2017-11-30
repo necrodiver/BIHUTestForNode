@@ -6,10 +6,15 @@ const strVerify = require('../middlewares/checkstr');
 const users = require('../operate/usersoperate');
 const init = require('../middlewares/init');
 const aesHelper = require('../middlewares/aeshelper');
+/**
+ * 首页
+ */
 router.get('/', function (req, res, next) {
     res.redirect('/home/index');
 });
-
+/**
+ * 首页
+ */
 router.get('/index', init.InitRole, init.InitAuthority, function (req, res, next) {
     let isLogin = false;
     if (req.session.user) {
@@ -21,6 +26,9 @@ router.get('/index', init.InitRole, init.InitAuthority, function (req, res, next
     });
 })
 
+/**
+ * 登录
+ */
 router.post('/signin', checkNotLogin, function (req, res, next) {
     let userName = req.body.Email;
     let pwd = req.body.Pwd;
@@ -69,7 +77,9 @@ router.post('/signin', checkNotLogin, function (req, res, next) {
     }).catch(next);
 
 });
-
+/**
+ * 登出
+ */
 router.get('/signout', checkLogin, function (req, res, next) {
     req.session.user = null;
     res.redirect('/home/index');

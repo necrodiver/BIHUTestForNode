@@ -1,0 +1,901 @@
+<% include header %>
+<div id="mycenter" v-cloak>
+    <div class="ui secondary pointing menu">
+        <a class="item active" v-on:click="isShow=1">个人信息 </a>
+        <template v-if="roleId<=1">
+            <a class="item" v-on:click="isShow=2">员工管理 </a>
+            <a class="item" v-on:click="isShow=3">考勤备注审批 </a>
+            <a class="item" v-on:click="isShow=4">管理小组 </a>
+        </template>
+    </div>
+
+    <div v-show="isShow==1">
+        <div class="left22">
+            <h2 class="ui center aligned icon header">
+                <i class="circular user icon" style="cursor:pointer;" id="usertitle" title="点此修改基本信息" v-on:click="showEditUserBox(0,nowUser)"></i>用户信息 </h2>
+            <div class="ui text container center aligned">
+                <div class="column">
+                    <label>用户名：{{nowUser.UserName}}</label>
+                </div>
+                <div class="column">
+                    <label>扮演角色：{{nowUser.RoleId|RoleTransName}}</label>
+                </div>
+                <div class="column">
+                    <label>小组：{{nowUser.GroupId|GroupTransName(groupData.groupList)}}</label>
+                </div>
+                <div class="column">
+                    <label>登录邮箱：{{nowUser.Email}}</label>
+                </div>
+                <div class="column">
+                    <label>创建日期：{{nowUser.CreateTime}}</label>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <template v-if="roleId<=1">
+        <div v-show="isShow==2">
+            <div class="height15"></div>
+            <div class="left22">
+                <table class="ui selectable celled table">
+                    <thead>
+                        <tr>
+                            <th colspan="7">
+                                <div class="ui left floated small red labeled icon button" v-on:click="deleteUserList">
+                                    <i class="remove user icon"></i> 删除用户 </div>
+                                <select class="ui small medium search dropdown left" id="selectGroup1"></select>
+                                <select class="ui small medium search dropdown left" id="selectUserName1"></select>
+                                <div class="ui right floated small green labeled icon button" v-on:click="showEditUserBox(1)">
+                                    <i class="add user icon"></i> 添加用户 </div>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                <input type="checkbox" class="select-parent" v-on:click="checkSelectAll($event)" />
+                            </th>
+                            <th class="two wide">姓名</th>
+                            <th class="five wide">邮箱地址(登录名)</th>
+                            <th class="two wide">小组</th>
+                            <th class="three wide">创建时间</th>
+                            <th class="two wide">角色</th>
+                            <th class="two wide">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(item,index) in userList">
+                            <td class="collapsing">
+                                <input class="select-item" type="checkbox" v-on:click="checkSelect(item,$event)" />
+                            </td>
+                            <td>{{item.UserName}}</td>
+                            <td>{{item.Email}}</td>
+                            <td>{{item.GroupId|GroupTransName(groupData.groupList)}}</td>
+                            <td>{{item.CreateTime}}</td>
+                            <td>{{item.RoleId|RoleTransName}}</td>
+                            <td>
+                                <button class="ui icon button mini basic blue" v-on:click="showEditUserBox(0,item)">
+                                    <i class="edit icon"></i>
+                                </button>
+                                <button class="ui icon button mini basic red" v-on:click="deleteOneUser(item)">
+                                    <i class="trash outline icon"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="7">
+                                <pagination class="right" ref="pageUser" v-bind:pages="req.where.pageNum" v-bind:current.sync="req.where.pageIndex" v-on:navpage="getUserList"></pagination>
+                            </th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <div v-show="isShow==3">
+            <div class="height15"></div>
+            <div class="left22">
+                <table class="ui celled table">
+                    <thead>
+                        <tr>
+                            <th colspan="8">
+                                <div class="ui selection dropdown medium small" id="selectMonth">
+                                    <input type="hidden" />
+                                    <i class="dropdown icon"></i>
+                                    <div class="default text">考勤月份</div>
+                                    <div class="menu">
+                                        <div class="item" data-value="1">1月</div>
+                                        <div class="item" data-value="2">2月</div>
+                                        <div class="item" data-value="3">3月</div>
+                                        <div class="item" data-value="4">4月</div>
+                                        <div class="item" data-value="5">5月</div>
+                                        <div class="item" data-value="6">6月</div>
+                                        <div class="item" data-value="7">7月</div>
+                                        <div class="item" data-value="8">8月</div>
+                                        <div class="item" data-value="9">9月</div>
+                                        <div class="item" data-value="10">10月</div>
+                                        <div class="item" data-value="11">11月</div>
+                                        <div class="item" data-value="12">12月</div>
+                                    </div>
+                                </div>
+                                <select class="ui small medium search dropdown left" id="selectGroup"></select>
+                                <select class="ui small medium search dropdown" id="selectUserName"></select>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th class="one wide">姓名</th>
+                            <th class="two wide">日期</th>
+                            <th class="two wide">具体时间范围</th>
+                            <th class="two wide">备注类别</th>
+                            <th class="four wide">备注内容</th>
+                            <th class="two wide">创建时间</th>
+                            <th class="two wide">审批状态</th>
+                            <th class="one wide">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(item,index) in attendance.list">
+                            <td>{{item.UserName}}</td>
+                            <td>{{item.ClockTime}}</td>
+                            <td>{{item.TimeSlot|TimeSlotForName}}</td>
+                            <td>{{markStateList[item.UDayStateId]}}</td>
+                            <td>{{item.ClockContent}}</td>
+                            <td>{{item.CreateTime}}</td>
+                            <td>{{item.IsPass|IsPassForName}}</td>
+                            <td class="center">
+                                <input type="checkbox" v-on:click="checkIsPass(item,$event)" v-bind:checked="IsChecked(item)" title="勾选为通过,未勾选则不通过" />
+                                <strong>过</strong>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="8">
+                                <pagination class="right" ref="pageMark" v-bind:pages="attendance.where.pageNum" v-bind:current.sync="attendance.where.pageIndex"
+                                    v-on:navpage="pagingA"></pagination>
+                            </th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <div v-show="isShow==4">
+            <div class="height15"></div>
+            <div class="left22">
+                <template v-for="item in groupData.groupList">
+                    <div class="ui yellow message">
+                        <i class="star icon"></i> {{item.GroupName}}
+                        <i class="edit icon cursor-pointer" v-on:click="updateGroup(item)"></i>
+                        <i class="close icon" v-on:click="deleteGroup(item)"></i>
+                    </div>
+                </template>
+                <div class="ui default message center button" v-on:click="addGroup">
+                    <i class="add icon"></i> 新增组......</div>
+            </div>
+        </div>
+    </template>
+    <div class="ui small modal" id="editUser">
+        <div class="header" id="editUser-header">
+        </div>
+        <div class="content ui form" v-if="editUser">
+            <div id="add-user" class="field">
+                <textarea rows="2" maxlength="1000" placeholder="这里填写新增的用户姓名，单个用户请直接输入用户姓名，多个用户请使用英文逗号分隔(例如：张三,李四,王五)，最多可输入1000个字符" id="markReason"
+                    v-model="editUser.addUsers"></textarea>
+            </div>
+            <div id="edit-user">
+                <div class="field">
+                    <strong>用户姓名：{{editUser.editUser.UserName}}</strong>
+                </div>
+                <div class="field">
+                    <div class="ui input focus">
+                        <input type="email" maxlength="50" placeholder="输入新的登录邮箱地址,不填写默认不更新" v-model="editUser.editUser.Email">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui input focus">
+                        <input type="password" maxlength="20" placeholder="输入新的密码,不填写默认不更新" v-model="editUser.editUser.Pwd">
+                    </div>
+                </div>
+                <div class="field" v-if="!editNowUser">
+                    <div class="inline fields">
+                        <label>权限角色(不填为默认)： </label>
+                        <template v-for="i in 3">
+                            <div class="field">
+                                <div class="ui radio checkbox">
+                                    <input type="radio" name="roles" checked="checked" :value="i" v-model="editUser.editUser.RoleId">
+                                    <label>{{i|RoleTransName}}</label>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="inline fields">
+                        <label>归属小组(不填为默认)： </label>
+                        <template v-for="item in groupData.groupList">
+                            <div class="field">
+                                <div class="ui radio checkbox">
+                                    <input type="radio" name="groups" checked="checked" :value="item.GroupId" v-model="editUser.editUser.GroupId">
+                                    <label>{{item.GroupName}}</label>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="actions">
+            <div class="ui cancel button" id="btnCancle">取消 </div>
+            <div class="ui positive right labeled icon button">确定
+                <i class="checkmark icon"></i>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: '#mycenter',
+        data: {
+            isShow: 1,
+            roleId:<%= User.RoleId %>,
+            req: {
+                pageIndex: 1,
+                pageNum: 1,
+                pageSize: 10,
+                visiblePage: 3,
+                pageList: {},
+                userName: '',
+                userId: -1,
+                selectUserList: [],
+                totalCount: 0,
+                leftNum: 0,
+                rightNum: 5,
+                groupId: <%= User.GroupId %>,
+                where: {
+                    pageIndex: 1,
+                    totalCount: 0,
+                    pageSize: 10,
+                    pageNum: 1,
+                    UserId: -1,
+                    GroupId: <%= User.GroupId %>
+                }
+            },
+    userList: [],
+        selectedList: [],
+            editUser: {
+        editUser: { },
+        addUsers: '',
+            isAdd: 1
+    },
+    nowUser: {
+        UserId: <%= User.UserId %>,
+        UserName: '<%= User.UserName %>',
+        Email: '<%= User.Email %>',
+        RoleId:<%= User.RoleId %>,
+        CreateTime: '<%= User.CreateTime %>',
+        GroupId: <%= User.GroupId %>,
+        Pwd: ''
+    },
+    attendance: {
+        where: {
+            pageIndex: 1,
+            totalCount: 0,
+            pageSize: 10,
+            pageNum: 1,
+            UserId: -1,
+            UserName: '',
+            Year: 2017,
+            GroupId: <%= User.GroupId %>,
+            Month: moment().subtract(1, 'month').format('MM')
+        },
+        list: []
+    },
+    groupData: {
+        groupList: [],
+            editGroup: {
+            GroupId: -1,
+                GroupName: ''
+        }
+    },
+    markStateList: ["--", "迟到", "早退", "早回家", "正常", "加班", "请假", "忘打卡"],
+        editNowUser: 1
+        },
+    mounted: function () {
+        init(this);
+        this.getUserList();
+        this.getUserAll();
+        this.getGroupList();
+    },
+    methods: {
+        getUserList: function (pageIndex) {
+            if (pageIndex != undefined && pageIndex == 1) {
+                this.$refs.pageUser.init();
+            }
+            this.selectedList = [];
+            this.req.where.pageIndex = pageIndex || this.req.where.pageIndex;
+            var reqJson = $.extend({}, this.req.where);
+            if (reqJson.UserId <= 0 || reqJson.UserId == '' || reqJson.UserId == undefined) {
+                reqJson.UserId = '';
+            }
+            if (reqJson.GroupId <= 0 || reqJson.GroupId == '' || reqJson.GroupId == undefined) {
+                reqJson.GroupId = '';
+            }
+            var _self = this;
+            var req = $.ajax({
+                type: 'POST',
+                url: bhConfig.GetUserList,
+                data: reqJson,
+                dataType: "JSON",
+                cache: false
+            });
+            req.done(function (res) {
+                if (res == null || res == "")
+                    return helper.toolTipBox("操作失败");
+                if (res.MsgStatus) {
+                    _self.userList = $.extend([], res.MsgContent.list);
+                    _self.req.where.totalCount = res.MsgContent.totalCount;
+
+                    _self.paging();
+                }
+                else
+                    return helper.toolTipBox(res.MsgContent);
+            });
+            req.always(function () {
+            });
+        },
+        getUserAll: function () {
+            var _self = this;
+            var req = $.ajax({
+                type: 'POST',
+                url: bhConfig.GetUserAll,
+                dataType: "JSON",
+                cache: false
+            });
+            req.done(function (res) {
+                if (res == null || res == "")
+                    return helper.toolTipBox("操作失败");
+                if (res.MsgStatus) {
+
+                    $('#selectUserName1').children('option').remove();
+                    $('#selectUserName1').append('<option value="-1">输入姓名</option>');
+                    res.MsgContent.forEach(function (item) {
+                        $('#selectUserName1').append('<option value="' + item.UserId + '">' + item.UserName + '</option>');
+                    });
+                    $('#selectUserName1').dropdown('set value', _self.req.where.UserId);
+                    $('#selectUserName1').dropdown('setting', 'onChange', function (val) {
+                        if (_self.req.where.UserId != val)
+                            _self.req.where.UserId = parseInt(val);
+                    });
+
+                    $('#selectUserName').children('option').remove();
+                    $('#selectUserName').append('<option value="-1">输入姓名</option>');
+                    res.MsgContent.forEach(function (item) {
+                        $('#selectUserName').append('<option value="' + item.UserId + '">' + item.UserName + '</option>');
+                    });
+                    $('#selectUserName').dropdown('set value', _self.attendance.where.UserId);
+                    $('#selectUserName').dropdown('setting', 'onChange', function (val) {
+                        if (_self.attendance.where.UserId != parseInt(val)) {
+                            _self.attendance.where.UserId = val;
+                            _self.pagingA(1);
+                        }
+                    });
+                }
+            });
+            init(this);
+        },
+        checkSelect: function (item, event) {
+            var index = this.selectedList.indexOf(item);
+            if ($(event.target).is(":checked")) {
+                if (index < 0)
+                    this.selectedList.push(item);
+            } else {
+                $('.select-parent').prop('checked', false);
+                this.selectedList.splice(index, 1);
+            }
+            if (this.selectedList.length == this.userList.length) {
+                $('.select-parent').prop('checked', true);
+                this.selectedList = $.extend([], this.userList);
+            }
+
+            console.log(this.selectedList);
+        },
+        checkSelectAll: function (event) {
+            if ($(event.target).is(":checked"))
+                this.selectedList = $.extend([], this.userList);
+            else
+                this.selectedList = [];
+            $('.select-item').prop('checked', $(event.target).is(":checked"));
+            console.log(this.selectedList);
+        },
+        paging: function () {
+            if (this.req.where.pageIndex <= 0)
+                this.req.where.pageIndex = 1;
+            var maxPage = parseInt(this.req.where.totalCount / this.req.where.pageSize);
+            var mod = this.req.where.totalCount % this.req.where.pageSize;
+            mod > 0 ? ++maxPage : maxPage;
+            this.req.where.pageNum = maxPage;
+        
+            $('.select-item').prop('checked', false);
+            $('.select-parent').prop('checked', false);
+        },
+        selectGroupOne: function () {
+            var groupId = this.req.groupId;
+            if (groupId == undefined || groupId == '' || groupId <= 0)
+                return this.paging(1);
+
+            var thisUser = [];
+            thisUser = this.userList.filter(function (item) {
+                return item.GroupId == groupId;
+            });
+            if (thisUser) {
+                this.selectedList = [];
+                this.req.selectUserList = thisUser;
+                this.req.cutLength = 1;
+                $('.select-item').prop('checked', false);
+                $('.select-parent').prop('checked', false);
+            }
+        },
+        deleteListLast: function () {
+            var _self = this;
+            var userIds = new Array();
+
+            this.selectedList.forEach(function (item) {
+                userIds.push(item.UserId);
+            });
+            if (userIds.length == 0)
+                return;
+            var req = $.ajax({
+                type: 'POST',
+                url: bhConfig.DeleteUserList,
+                data: {
+                    UserIds: userIds.toString()
+                },
+                dataType: "JSON",
+                cache: false
+            });
+            req.done(function (res) {
+                if (res == null || res == "")
+                    return helper.toolTipBox("操作失败");
+                if (res.MsgStatus) {
+                    _self.getUserList(1);
+                    _self.selectedList = [];
+                    _self.req.pageIndex = 1;
+                    _self.getUserAll();
+                }
+                return helper.toolTipBox(res.MsgContent);
+            });
+        },
+        showEditUserBox: function (isAdd, item) {
+            $('#editUser').modal('show');
+            this.editUser.boxTitle = isAdd ? "新增用户" : "修改用户";
+            this.editUser.isAdd = isAdd;
+            if (isAdd) {
+                $('#add-user').css('display', 'block');
+                $('#edit-user').css('display', 'none');
+                this.editUser.editUser = {};
+            } else {
+                $('#add-user').css('display', 'none');
+                $('#edit-user').css('display', 'block');
+                this.editUser.editUser = $.extend({}, item);
+                this.editUser.editUser.RoleId = -1;
+                this.editUser.editUser.Email = '';
+                this.editUser.editUser.Pwd = '';
+                if (item == this.nowUser)
+                    this.editNowUser = 1;
+                else
+                    this.editNowUser = 0;
+            }
+            $('#editUser-header').text(this.editUser.boxTitle);
+        },
+        deleteUserList: function () {
+            var _self = this;
+            if (this.selectedList.length == 0) {
+                return helper.toolTipBox('请先选择要删除的项');
+            }
+            dialog({
+                title: '删除提示',
+                content: '你确定要删除选中的用户?',
+                ok: function () {
+                    _self.deleteListLast();
+                },
+                cancel: function () { }
+            }).show();
+        },
+        deleteOneUser(item) {
+            var _self = this;
+            if (item)
+                dialog({
+                    title: '删除提示',
+                    content: '你确定要删除用户[' + item.UserName + ']?',
+                    ok: function () {
+                        _self.selectedList = [item];
+                        _self.deleteListLast();
+                    },
+                    cancel: function () { }
+                }).show();
+        },
+        editUserOperate: function () {
+            //这里需要进行数据操作，新增或者修改
+            if (this.editUser.isAdd) {
+                this.addUserList();
+            } else {
+                this.editOneUser();
+            }
+        },
+        addUserList: function () {
+            var _self = this;
+            var req = $.ajax({
+                type: 'POST',
+                url: bhConfig.AddUserList,
+                data: {
+                    UserNames: this.editUser.addUsers
+                },
+                dataType: "JSON",
+                cache: false
+            });
+            req.done(function (res) {
+                if (res == null || res == "")
+                    return helper.toolTipBox("操作失败");
+                if (res.MsgStatus) {
+                    _self.getUserList(1);
+                    _self.editUser.addUsers = "";
+                    _self.req.pageIndex = 1;
+                    _self.getUserAll();
+                }
+                return helper.toolTipBox(res.MsgContent);
+            });
+        },
+        editOneUser: function () {
+            var _self = this;
+            var reqJson = $.extend({}, this.editUser.editUser);
+            if (reqJson == undefined || reqJson == null || reqJson == '')
+                return helper.toolTipBox('数据错误，请重新填写');
+            if (reqJson.UserId == undefined || reqJson.UserId == null || reqJson.UserId == '' || reqJson.UserId <= 0)
+                return helper.toolTipBox('数据错误，请重新填写');
+            if (reqJson.RoleId == -1)
+                reqJson.RoleId = '';
+            if (reqJson.GroupId == 0)
+                reqJson.GroupId = '';
+            var req = $.ajax({
+                type: 'POST',
+                url: bhConfig.EditUser,
+                data: reqJson,
+                dataType: "JSON",
+                cache: false
+            });
+            req.done(function (res) {
+                if (res == null || res == "")
+                    return helper.toolTipBox("操作失败");
+                if (res.MsgStatus) {
+                    _self.getUserList();
+                }
+                return helper.toolTipBox(res.MsgContent);
+            });
+        },
+        getAList: function (index, callback) {
+            this.attendance.where.pageIndex = index || this.attendance.where.pageIndex;
+            var reqJson = $.extend({}, this.attendance.where);
+            if (reqJson.UserId == -1)
+                reqJson.UserId = '';
+            if (reqJson.GroupId <= 0 || reqJson.GroupId == '')
+                reqJson.GroupId = '';
+            reqJson.Month = parseInt(reqJson.Month);
+            this.attendance.list = [];
+            var _self = this;
+            var req = $.ajax({
+                type: 'POST',
+                url: bhConfig.GetAttendanceList,
+                data: reqJson
+            });
+            req.done(function (res) {
+                if (res == null || res == "")
+                    return helper.toolTipBox("操作失败");
+                if (res.MsgStatus) {
+                    _self.attendance.list = res.MsgContent.list;
+                    _self.attendance.where.totalCount = res.MsgContent.totalCount;
+                    callback(_self);
+                } else {
+                    return console.log(res.MsgContent);
+                }
+            });
+        },
+        pagingA: function (pageIndex) {
+            if (pageIndex != undefined && pageIndex == 1) {
+                this.$refs.pageMark.init();
+            }
+            this.getAList(pageIndex, function (_self) {
+                var _where = _self.attendance.where;
+                if (pageIndex == undefined) {
+                    _where.pageIndex = 1;
+                } else {
+                    _where.pageIndex = pageIndex;
+                }
+                if (_where.pageIndex <= 0)
+                    _where.pageIndex = 1;
+                var maxPage = parseInt(_where.totalCount / _where.pageSize);
+                var mod = _where.totalCount % _where.pageSize;
+                mod > 0 ? ++maxPage : maxPage;
+                _where.pageNum = maxPage;
+                _self.attendance.where = _where;
+            });
+        },
+        checkIsPass: function (item, event) {
+            var num = this.attendance.list.indexOf(item);
+            var _self = this;
+            var reqJson = {};
+            reqJson.AttendanceId = item.AttendanceId;
+            reqJson.IsPass = $(event.target).is(":checked") ? 1 : 2;
+            if (num < 0)
+                return helper.toolTipBox("查无此条记录，请刷新重试");
+            var req = $.ajax({
+                type: 'POST',
+                url: bhConfig.EditAttendanceIsPass,
+                data: reqJson
+            });
+            req.done(function (res) {
+                if (res == null || res == "")
+                    return helper.toolTipBox("操作失败");
+                if (res.MsgStatus) {
+                    _self.attendance.list[num].IsPass = reqJson.IsPass;
+                } else {
+                    return console.log(res.MsgContent);
+                }
+            });
+        },
+        IsChecked: function (item) {
+            if (item) {
+                if (item.IsPass == 1)
+                    return 1;
+                else
+                    return 0;
+            }
+            return 0;
+        },
+        getGroupList: function () {
+            var _self = this;
+            var req = $.ajax({
+                type: 'POST',
+                url: bhConfig.GetGroupList
+            });
+            req.done(function (res) {
+                if (res == null || res == "")
+                    return helper.toolTipBox("操作失败");
+                if (res.MsgStatus) {
+                    _self.groupData.groupList = res.MsgContent;
+                    if (res.MsgContent.length > 0)
+                        _self.bindGroup();
+                } else {
+                    return console.log(res.MsgContent);
+                }
+            });
+        },
+        updateGroup: function (item) {
+            var _self = this;
+            var d = dialog({
+                title: '修改组名',
+                content: '<input id="property-returnValue-groupname" value="' + item.GroupName + '" />',
+                ok: function () {
+                    var value = $('#property-returnValue-groupname').val();
+                    if (value == '' || value.length <= 2) {
+                        helper.toolTipBox("分组命名最少不得小于3个字符长度");
+                        return;
+                    }
+                    if (item.GroupName == value) {
+                        helper.toolTipBox("新的分组命名和原来一样，不予修改");
+                        return;
+                    }
+                    item.GroupName = value;
+                    _self.EditGroup(2, item);
+                    this.remove();
+                }
+            });
+            d.show();
+        },
+        deleteGroup: function (item) {
+            var _self = this;
+            dialog({
+                title: '删除组别提示',
+                content: '你确定要删除小组 [' + item.GroupName + ']?(删除后此小组内所有小组成员将没有组别展示，请慎重考虑！)',
+                ok: function () {
+                    _self.EditGroup(0, item);
+                },
+                cancel: function () { }
+            }).show();
+        },
+        addGroup: function () {
+            var _self = this;
+            var d = dialog({
+                title: '新增组别',
+                content: '<input id="property-returnValue-groupname" placeholder="请输入组名"/>',
+                ok: function () {
+                    var value = $('#property-returnValue-groupname').val();
+                    if (value == '' || value.length <= 2) {
+                        helper.toolTipBox("分组命名最少不得小于3个字符长度");
+                        return;
+                    }
+                    var item = {};
+                    item.GroupName = value;
+                    _self.EditGroup(1, item);
+                    this.remove();
+                }
+            });
+            d.show();
+        },
+        EditGroup: function (editType, item) {
+            if (!this.groupData.groupList)
+                return helper.toolTipBox('当前获取的分组信息失败，请先检查日志文件');
+            var reqJson = $.extend({}, item);
+            reqJson.MarkIUD = editType;
+            var _self = this;
+            var req = $.ajax({
+                type: 'POST',
+                url: bhConfig.EditGroup,
+                data: reqJson
+            });
+            req.done(function (res) {
+                if (res == null || res == "")
+                    return helper.toolTipBox("操作失败");
+                if (res.MsgStatus) {
+                    _self.getGroupList();
+                }
+                return helper.toolTipBox(res.MsgContent);
+            });
+        },
+        bindGroup: function () {
+            //this.selectGroupOne();
+            var _self = this;
+            $('#selectGroup').children('option').remove();
+            $('#selectGroup1').children('option').remove();
+            $('#selectGroup').append('<option value="-1">选择小组</option>');
+            $('#selectGroup1').append('<option value="-1">选择小组</option>');
+            this.groupData.groupList.forEach(function (item) {
+                $('#selectGroup').append('<option value="' + item.GroupId + '">' + item.GroupName + '</option>');
+                $('#selectGroup1').append('<option value="' + item.GroupId + '">' + item.GroupName + '</option>');
+            });
+            $('#selectGroup').dropdown('set value', _self.attendance.where.GroupId);
+            $('#selectGroup1').dropdown('set value', _self.req.where.GroupId);
+            $('#selectGroup').dropdown('setting', 'onChange', function (val) {
+                if (_self.attendance.where.GroupId != val) {
+                    _self.attendance.where.GroupId = val;
+                }
+            });
+            $('#selectGroup1').dropdown('setting', 'onChange', function (val) {
+                if (_self.req.where.GroupId != val) {
+                    _self.req.where.GroupId = parseInt(val);
+                }
+            });
+        }
+    },
+    filters: {
+        RoleTransName: function (value) {
+            if (value) {
+                if (value == 1)
+                    return "管理员";
+                else if (value == 2)
+                    return "普通员工";
+                else if (value == 3)
+                    return "观察者";
+                else
+                    return '--';
+            }
+            return '--'
+        },
+        GroupTransName: function (value, groupList) {
+            if (value == 0) {
+                return '暂未分组';
+            }
+            if (value) {
+                if (!groupList)
+                    return '--';
+                var group = groupList.filter(function (item) {
+                    return item.GroupId == value;
+                });
+                if (group && group.length == 1 && group[0]) {
+                    return group[0].GroupName;
+                }
+                return '--';
+            }
+            return '--';
+        },
+        TimeSlotForName: function (value) {
+            if (value >= 0) {
+                if (value == 0)
+                    return '全天';
+                else if (value == 1)
+                    return '上午';
+                else if (value == 2)
+                    return '下午';
+                else
+                    return '--';
+            }
+            return '--';
+        },
+        IsPassForName: function (value) {
+            if (value >= 0) {
+                if (value == 0)
+                    return '未审批';
+                else if (value == 1)
+                    return '通过';
+                else if (value == 2)
+                    return '驳回';
+            }
+        }
+    },
+    watch: {
+        'isShow': function (newVal) {
+            if (newVal == 1) {
+                this.getGroupList();
+            }
+            if (newVal == 2) {
+                this.getGroupList();
+                this.getUserList(1);
+            }
+            else if (newVal == 3) {
+                this.getGroupList();
+                this.$refs.pageMark.init();
+                this.pagingA(1);
+                $('.head-title')
+                    .popup({
+                        inline: false
+                    });
+                var _self = this;
+                $('#selectMonth').dropdown('set value', _self.attendance.where.Month);
+                $("#selectMonth").dropdown({
+                    onChange: function (val) {
+                        if (_self.attendance.where.Month != parseInt(val)) {
+                            _self.attendance.where.Month = parseInt(val);
+                            _self.pagingA(1);
+                        }
+                    }
+                });
+            } else if (newVal == 4) {
+                this.getGroupList();
+            }
+        },
+        'attendance.where.UserName': function (newVal, oldVal) {
+            var thisUser = this.userList.filter(function (item) {
+                return item.UserName == newVal;
+            });
+            if (thisUser != [] && thisUser.length > 0) {
+                return this.pagingA(1);
+            }
+        },
+        'attendance.where.GroupId': function (newVal, oldVal) {
+            if (newVal == oldVal)
+                return;
+            return this.pagingA(1);
+        },
+        'req.where.UserId': function () {
+            this.getUserList(1);
+        },
+        'req.where.GroupId': function () {
+            this.getUserList(1);
+        }
+    }
+    });
+    function init(_self) {
+        $('#editUser')
+            .modal({
+                blurring: true,
+                onDeny: function () {
+                    //这里调用取消
+                },
+                onApprove: function () {
+                    _self.editUserOperate();
+                }
+            })
+            .modal('hide');
+        $('#usertitle')
+            .popup({
+                inline: false
+            });
+    }
+    window.onload = function () {
+        $('#selectUserName1').dropdown('set value', vm.req.where.UserId);
+        $('#selectUserName1').dropdown('setting', 'onChange', function (val) {
+            if (vm.req.where.UserId != val)
+                vm.req.where.UserId = parseInt(val);
+        });
+    }
+</script>
+<% include footer %>

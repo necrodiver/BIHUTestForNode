@@ -8,8 +8,12 @@ router.get('/', function (req, res, next) {
     res.redirect('/mycenter/index');
 });
 
-router.get('/index', function (req, res, next) {
-
+router.get('/index', checkLogin, function (req, res, next) {
+    res.render('mycenter', {
+        title: '个人中心',
+        isLogin: true,
+        User:req.session.user
+    });
 });
 
 module.exports = router;

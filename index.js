@@ -34,10 +34,16 @@ app.use(session({
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 // flash 中间件，用来显示通知
-app.use(flash());
+//app.use(flash());
 
 // 路由
 routes(app);
+
+app.use(function (err, req, res, next) {
+   // req.flash('error', err.message);
+    res.redirect('/home/index');
+});
+
 // 监听端口，启动程序
 app.listen(config.port, function () {
     console.log(`${pkg.name} listening on port ${config.port}`)
