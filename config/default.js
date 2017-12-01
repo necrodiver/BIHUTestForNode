@@ -1,5 +1,5 @@
 module.exports = {
-    port: 3000,
+    port: 3001,
     session: {
       secret: 'sixthrhapsody', //session签名
       key: 'sixthrhapsody', //返回客户端的key的名称，默认为connect.sid,也可以自己设置

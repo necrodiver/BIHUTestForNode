@@ -36,12 +36,7 @@ exports.addUsers = function (users) {
  * @param {*} next 
  */
 exports.getAllList = function (next) {
-    Users.findAll().then(function (userList) {
-        next(userList);
-    }).catch(function (err) {
-        console.log(err);
-        throw new Error(err);
-    });
+    return Users.findAll();
 }
 /**
  * 获取符合user条件的用户列表
@@ -52,13 +47,18 @@ exports.getList = function (user) {
         where: user
     });
 }
-exports.getPageList = function (leftNum, lengthNum) {
-    Users.findAll({ offset: leftNum, limit: lengthNum }).then(function (userList) {
+exports.getPageList = function (user, limit) {
+    // include: [{
+    //     model: Task,
+    //     where: { state: Sequelize.col('project.state') }
+    // }]
+    return Users.findAll({ where: user }, limit);
+    // .then(function (userList) {
 
-    }).catch(function (err) {
-        console.log(err);
-        throw new Error(err);
-    });
+    // }).catch(function (err) {
+    //     console.log(err);
+    //     throw new Error(err);
+    // });
 }
 
 exports.deleteList = function (users) {
