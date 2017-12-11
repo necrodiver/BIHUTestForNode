@@ -1,3 +1,9 @@
+/**
+ * 检测路由权限
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 exports.urlFilter = function (req, res, next) {
     if (!req.session.user) {
         return res.json({
@@ -47,6 +53,12 @@ exports.urlFilter = function (req, res, next) {
         });
     }
 }
+/**
+ * 检测第一权限
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 exports.UserVersion1 = function (req, res, next) {
     if (!req.session.user) {
         return res.json({
@@ -61,6 +73,12 @@ exports.UserVersion1 = function (req, res, next) {
         });
     }
 }
+/**
+ * 检测第二权限
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 exports.UserVersion2 = function (req, res, next) {
     if (!req.session.user) {
         return res.json({
@@ -75,6 +93,12 @@ exports.UserVersion2 = function (req, res, next) {
         });
     }
 }
+/**
+ * 检测第三权限
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 exports.UserVersion3 = function (req, res, next) {
     if (!req.session.user) {
         return res.json({

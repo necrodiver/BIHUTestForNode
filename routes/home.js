@@ -15,7 +15,7 @@ router.get('/', function (req, res, next) {
 /**
  * 首页
  */
-router.get('/index', init.InitRole, init.InitAuthority, function (req, res, next) {
+router.get('/index',init.InitRole, init.InitAuthority, function (req, res, next) {
     let isLogin = false;
     if (req.session.user) {
         isLogin = true;
@@ -84,5 +84,18 @@ router.get('/signout', checkLogin, function (req, res, next) {
     req.session.user = null;
     res.redirect('/home/index');
 });
-
+router.get('/404',function(req,res,next){
+    req.session.user=null;
+    res.render('404',{
+        title: '404错误',
+        isLogin: false
+    });
+});
+router.get('/500',function(req,res,next){
+    req.session.user=null;
+    res.render('500',{
+        title: '500错误',
+        isLogin: false
+    });
+});
 module.exports = router;

@@ -40,9 +40,9 @@ app.use(bodyParser.json());
 routes(app);
 
 app.use(function (err, req, res, next) {
-   // req.flash('error', err.message);
-    res.redirect('/home/index');
-});
+    // req.flash('error', err.message);
+     res.redirect('/home/500');
+ });
 
 // 监听端口，启动程序
 app.listen(config.port, function () {
