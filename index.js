@@ -1,12 +1,12 @@
 const path = require('path');
 const express = require('express');
 const session = require('express-session');
-const MongoStore = require('connect-mongo')(session);
-const flash = require('connect-flash');
+//const MongoStore = require('connect-mongo')(session);
+//const flash = require('connect-flash');
 const config = require('config-lite')(__dirname);
 const routes = require('./routes');
 const pkg = require('./package');
-const bodyParser=require('body-parser');
+const bodyParser = require('body-parser');
 const app = express();
 
 // 设置模板目录
@@ -26,23 +26,21 @@ app.use(session({
         maxAge: config.session.maxAge// 过期时间，过期后 cookie 中的 session id 自动删除
     }
     // ,
-    // store: new MongoStore({// 将 session 存储到 mongodb
+    // store: new MongoStore({// 将 session 存储到 mongodb,这里不用了
     //     url: config.mongodb// mongodb 地址
     // })
 }));
 
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-// flash 中间件，用来显示通知
-//app.use(flash());
 
 // 路由
 routes(app);
 
 app.use(function (err, req, res, next) {
     // req.flash('error', err.message);
-     res.redirect('/home/500');
- });
+    res.redirect('/home/500');
+});
 
 // 监听端口，启动程序
 app.listen(config.port, function () {

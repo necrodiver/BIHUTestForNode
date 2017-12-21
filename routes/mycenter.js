@@ -1,11 +1,15 @@
 const express = require('express');
+const pinyin = require('pinyin');
+const moment = require('moment');
+const config = require('config-lite')(__dirname);
 const router = express.Router();
+
 const checkLogin = require('../middlewares/checklogin').checkLogin;
 const checkNotLogin = require('../middlewares/checklogin').checkNotLogin;
 const users = require('../operate/usersoperate');
 const userVersion = require('../middlewares/userversion');
 const userFilter = require('../modelfilter/userfilter');
-
+const aesHelper = require('../middlewares/aeshelper');
 router.get('/', function (req, res, next) {
     res.redirect('/mycenter/index');
 });
@@ -49,15 +53,30 @@ router.post('/GetUserList', userVersion.urlFilter, userVersion.UserVersion1, fun
 /**
  * 添加用户集合
  */
-router.post('/AddUserList', checkLogin, userVersion.urlFilter,userVersion.UserVersion1, userFilter.userNameFilter, function (req, res, next) {
-    //这里需要转换姓名为拼音，然后添加到数据库
+router.post('/AddUserList', checkLogin, userVersion.urlFilter, userVersion.UserVersion1, userFilter.userNameFilter, function (req, res, next) {
+    let userNames = req.body.UserNames;
+    let userNamesList = userNames.split(',');
+    let userModelList = [];
+    userNamesList.array.forEach(element => {
+        var namePY = pinyin(element, {
+            style: pinyin.STYLE_NORMAL
+        }).join();
+        userModelList.push({
+            UserName: element,
+            Email: namePY + config.defaultConf.lastEmail,
+            Pwd: aesHelper.aesEncrypt(namePY),
+            CreateTime: moment().format('YYYY-MM-DD HH:mm:ss'),
+            RoleId: config.defaultConf.addRoleId,
+            GroupId: req.session.user.GroupId
+        });
+    });
 });
 router.post('/MyCenter/DeleteUserList', checkLogin, userVersion.UserVersion1, userVersion.urlFilter, function (req, res, next) {
     //这里删除用户合集
 });
-router.post('/MyCenter/EditUser', checkLogin, userVersion.urlFilter, userVersion.UserVersion1, function () {
+router.post('/MyCenter/EditUser', checkLogin, userVersion.urlFilter, userVersion.UserVersion1, (req, res, next) => {
 
 });
-
+//26cm*18cm
 
 module.exports = router;
