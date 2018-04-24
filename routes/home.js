@@ -4,7 +4,6 @@ const checkLogin = require('../middlewares/checklogin').checkLogin;
 const checkNotLogin = require('../middlewares/checklogin').checkNotLogin;
 const strVerify = require('../middlewares/checkstr');
 const users = require('../operate/usersoperate');
-const init = require('../middlewares/init');
 const aesHelper = require('../middlewares/aeshelper');
 /**
  * 首页
@@ -15,7 +14,7 @@ router.get('/', function (req, res, next) {
 /**
  * 首页
  */
-router.get('/index', init.InitRole, init.InitAuthority, function (req, res, next) {
+router.get('/index',function (req, res, next) {
     let isLogin = false;
     if (req.session.user) {
         isLogin = true;
