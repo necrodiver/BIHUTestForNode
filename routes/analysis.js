@@ -1,13 +1,18 @@
 var express = require('express');
 var router = express.Router();
 var checkLogin = require('../middlewares/checklogin').checkLogin;
+var helpers=require('../middlewares/heplers');
 
 router.get('/', checkLogin, function (req, res, next) {
-    res.send('考勤转换页面');
+    res.redirect('/analysis/index');
 });
 
 router.get('/index', checkLogin, function (req, res, next) {
-    res.send('考勤转换页面');
+    res.render('analysisexcel', {
+        title: '考勤查询',
+        IsAdmin: req.session.user.RoleId == 1,
+        User:JSON.stringify(req.session.user)
+    });
 });
 
 router.post('/analysisuserlist', checkLogin, function (req, res, next) {

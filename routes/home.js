@@ -62,7 +62,7 @@ router.post('/signin', checkNotLogin, function (req, res, next) {
             msgModel.MsgContent = "当前登录名或密码错误，请重新输入";
         } else if (userlist.length == 1) {
             let userModel = userlist[0];
-            delete userModel.Pwd;
+            delete userModel.dataValues.Pwd;
             req.session.user = userModel; //只有这里是保存用户信息
             msgModel.MsgStatus = true;
             msgModel.MsgContent = userModel;
