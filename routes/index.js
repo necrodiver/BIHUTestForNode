@@ -1,5 +1,6 @@
 const init = require('../middlewares/init');
 const userVersion = require('../middlewares/userversion');
+const checkLogin = require('../middlewares/checklogin').checkLogin;
 
 module.exports = function (app) {
     app.get('/', function (req, res) {
@@ -8,6 +9,6 @@ module.exports = function (app) {
     app.use(init.InitRole);
     app.use(init.InitAuthority);
     app.use('/home', require('./home'));
-    app.use('/analysis', require('./analysis'));
-    app.use('/mycenter', require('./mycenter'));
+    app.use('/analysis', checkLogin, require('./analysis'));
+    app.use('/mycenter', checkLogin, require('./mycenter'));
 }

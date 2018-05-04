@@ -203,6 +203,7 @@
 </div>
 <script type="text/javascript">
     var __RequestVerificationToken = $('input[name="__RequestVerificationToken"]').val();
+    var userInfo = <%- User %>;
     function init(_self) {
         _self.markStateList.forEach(function (item, i) {
             $("#markStatusMenu").append("<div class='item' data-value=" + i + ">" + item + "</div>");
@@ -240,7 +241,7 @@
         el: '#vue1',
         data: {
             userPunchCards: [],
-            userName: "@ViewBag.UserName",
+            userName: userInfo.UserName,
             userMounthNullCount: 0,
             userMounths: [],
             userMounthNulls: {},//当月无数据时的结构
@@ -268,7 +269,7 @@
             selectMarkData: {
                 year: 2018,
                 //userId: -1,
-                userName: "@ViewBag.UserName"
+                userName: userInfo.UserName
             },
             showSingleDayRemark: [],//展示单天的打卡记录
             markStateList: ["请选择备注类别", "迟到", "早退", "早回家", "正常", "加班", "请假", "忘打卡"],
@@ -753,6 +754,5 @@
             }
         });
     });
-    var asasas= <%- User %>;
 </script>
 <% include header %>
