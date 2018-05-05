@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const checkLogin = require('../middlewares/checklogin').checkLogin;
 const helpers = require('../middlewares/heplers');
+const checkstr = require('../middlewares/checkstr');
+const serializeattendance = require('../middlewares/serializeattendance');
 const fs = require('fs');
 const multer = require('multer');
 const upload = multer({
     dest: 'public/xls/'
 });
-const excelPath = './public/xls/';
+const excelPath = "./public/xls/";
 
 router.get('/', function (req, res, next) {
     res.redirect('/analysis/index');
@@ -42,10 +43,30 @@ router.post('/UploadXls', upload.single('requestFile'), function (req, res, next
     });
 
 });
-
-router.post('/getmonthdata', function (req, res, next) {
-    //处理获取内容
-
+//获取考勤数据
+router.get('/GetMonthData', function (req, res, next) {
+    let msgModel = {
+        MsgTitle: '获取考勤数据',
+        MsgStatus: false,
+        MsgContent: ''
+    };
+    var monthNum = req.query.monthNum;
+    var checkModeled = checkstr.monthVerify(monthNum);
+    if (!checkModeled.isCheck) {
+        msgModel.MsgContent = checkModeled.data;
+        return res.json(msgModel);
+    }
+    let excelfileStr = excelPath + `${checkModeled.data}月考勤.xls`;
+    //后期添加redis存储，读取redis数据
+    fs.exists(excelfileStr, function (isexists) {
+        if (!isexists) {
+            msgModel.MsgContent = "查询数据不存在,你可以先进行操作等待考勤数据导入";
+        } else {
+            var excelJson = serializeattendance.getUserAllList(excelfileStr);
+            console.log(excelJson);
+        }
+        return res.json(msgModel);
+    });
 });
 
 router.post('/analysisuserlist', function (req, res, next) {
