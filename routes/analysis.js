@@ -15,10 +15,15 @@ router.get('/', function (req, res, next) {
 });
 
 router.get('/index', function (req, res, next) {
+    let isLogin = false;
+    if (req.session.user) {
+        isLogin = true;
+    }
     res.render('analysisexcel', {
         title: '考勤查询',
         IsAdmin: req.session.user.RoleId == 1,
-        User: JSON.stringify(req.session.user)
+        User: JSON.stringify(req.session.user),
+        isLogin:isLogin
     });
 });
 //上传Excel文件
