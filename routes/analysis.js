@@ -23,7 +23,7 @@ router.get('/index', function (req, res, next) {
         title: '考勤查询',
         IsAdmin: req.session.user.RoleId == 1,
         User: JSON.stringify(req.session.user),
-        isLogin:isLogin
+        isLogin: isLogin
     });
 });
 //上传Excel文件
@@ -74,24 +74,41 @@ router.get('/GetMonthData', function (req, res, next) {
     });
 });
 
-router.post('/analysisuserlist', function (req, res, next) {
+router.post('/AnalysisUserlist', function (req, res, next) {
     res.send('获取打卡备注列表');
 });
 
-router.post('/uploadxls', function (req, res, next) {
+router.post('/UploadXls', function (req, res, next) {
     res.send('上传xls文件');
 });
 
-router.post('/monthdata', function (req, res, next) {
+router.post('/MonthData', function (req, res, next) {
     res.send('获取考勤数据');
 });
 
-router.post('/editmarkstatus', function (req, res, next) {
+router.post('/EditMarkStatus', function (req, res, next) {
     res.send('操作打卡备注(增删改)');
 });
-
-router.post('/usermarkyeardata', function (req, res, next) {
+///获取打卡备注
+router.post('/UserMarkYearData', function (req, res, next) {
+    let msgModel = {
+        MsgTitle: '获取打卡备注',
+        MsgStatus: false,
+        MsgContent: ''
+    };
+    try {
+        let asModel = {
+            UserId: req.body.UserId,
+            UserName: req.body.UserName,
+            ClockYear: req.body.ClockYear
+        };
+        //let adList=
+    } catch (error) {
+        throw new Error(err);
+    }
     res.send('获取用户打卡年记录');
 });
+
+
 
 module.exports = router;

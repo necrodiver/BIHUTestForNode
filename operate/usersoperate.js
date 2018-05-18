@@ -70,7 +70,7 @@ exports.deleteList = function (users) {
         //       console.log('成功删除记录');
         //     }
     }).catch(function (err) {
-        console.log(err);
+        console.log(err.red);
         throw new Error(err);
     });
 }

@@ -19,7 +19,7 @@ var bhConfig = defineConst({
     UploadXls: "/Analysis/UploadXls",//上传xls文件
     GetMonthData: "/Analysis/GetMonthData",//获取考勤数据
     EditMarkStatus: "/Analysis/EditMarkStatus",//操作打卡备注(增删改)
-    GetUserMarkData: '/Analysis/GetUserMarkData',//获取用户打卡年记录
+    GetUserMarkData: '/Analysis/UserMarkYearData',//获取用户打卡年记录
     GetUserList: '/MyCenter/GetUserList',//获取用户列表
     AddUserList: '/MyCenter/AddUserList',//添加用户集合
     DeleteUserList: '/MyCenter/DeleteUserList',//删除用户集合
