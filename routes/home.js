@@ -14,7 +14,7 @@ router.get('/', function (req, res, next) {
 /**
  * 首页
  */
-router.get('/index',function (req, res, next) {
+router.get('/index', function (req, res, next) {
     let isLogin = false;
     if (req.session.user) {
         isLogin = true;
@@ -72,7 +72,6 @@ router.post('/signin', checkNotLogin, function (req, res, next) {
         }
         return res.json(msgModel);
     }).catch(next);
-
 });
 /**
  * 登出

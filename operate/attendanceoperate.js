@@ -4,75 +4,79 @@ const usersModel = require('../models/users');
 const Sequelize = require('sequelize');
 
 const Attendance = attendanceModel(linksequelize, Sequelize);
+const Users = usersModel(linksequelize, Sequelize);
 
 module.exports = {
     /**
-     * 查询考勤单条数据
-     * @param  模型实体 Attendance 
+     * 查询打卡记录单条备注
+     * @param  {Attendance} adModel 模型实体类
      */
     getSingleAttendance: function (adModel) {
+        console.log(`[打卡备注] 查询打卡记录单条备注 adModel:${JSON.stringify(adModel)}`);
         let whereModel = disposeAttendanceModel(adModel);
         return Attendance.findOne({
             where: whereModel
-        }).then(result => {
-            console.log(result);
-        }).catch(err => {
-            console.log(err);
         });
     },
     /**
-     * 添加一条考勤数据
-     * @param  模型实体 Attendance 
+     * 添加一条打卡备注
+     * @param  {Attendance} adModel 模型实体 
      */
     addAttendance: function (adModel) {
-        return Attendance.create(adModel).then(result => {
-            console.log(result);
-        }).catch(err => {
-            console.log(err);
-        });
+        console.log(`[打卡备注] 添加一条打卡备注 adModel:${JSON.stringify(adModel)}`);
+        return Attendance.create(adModel);
     },
     /**
-     * 删除一条考勤数据
-     * @param 考勤备注Id attendanceId 
+     * 删除一条打卡备注
+     * @param {number} attendanceId 考勤备注Id  
      */
     deleteAttendance: function (attendanceId) {
+        console.log(`[打卡备注] 删除一条打卡备注 attendanceId:${attendanceId}`)
         Attendance.destroy({
             id: attendanceId
-        }).then(result => {
-            console.log(result);
-        }).catch(err => {
-            console.log(err);
         });
     },
     /**
      * 读取用户打卡备注集合
-     * @param  模型实体 AttendanceSearchModel 
+     * @param {AttendanceSearchModel}  asModel 模型实体
      */
     getUserMarks: function (asModel) {
+        console.log(`[打卡备注] 读取用户打卡备注集合 asModel:${JSON.stringify(asModel)}`);
         let whereModel = {};
         if (asModel.UserId) {
-            whereModel.UserId = asModel.UserId;
+            whereModel.UserId = parseInt(asModel.UserId);
         }
         if (asModel.UserName) {
             whereModel.UserName = asModel.UserName;
         }
-        whereModel.ClockYear = asModel.ClockYear;
+        let whereAttendanceWhere = {};
+        whereAttendanceWhere.ClockYear = parseInt(asModel.ClockYear);
+
+        Users.hasMany(Attendance, {
+            foreignKey: 'userId',
+            sourceKey: 'userId',
+            //as:"user9"
+        });
+        Attendance.belongsTo(Users,{
+            foreignKey:'userId',
+            sourceKey: 'userId'
+        });
         return Attendance.findAll({
-            where: whereModel,
-            attributes: ["users.UserName", "attendance.*"],
+            where: whereAttendanceWhere,
+            attributes: ["user.UserName", "attendance.*"],
             include: [{
-                model: usersModel,
-                where: {
-                    UserId: Sequelize.col('users.UserId')
-                }
-            }]
+                model: Users,
+                where:whereModel
+            }],
+            raw:true
         });
     },
     /**
-     * 获取分页打卡备注数据
-     * @param  模型实体 AttendanceSearchModel 
+     * 获取分页打卡备注集合
+     * @param  {AttendanceSearchModel} asModel 模型实体  
      */
     getAttendanceList: function (asModel) {
+        console.log(`[打卡备注] 获取分页打卡备注集合 ${JSON.stringify(asModel)}`);
         let whereModel = {};
         if (asModel.UserId) {
             whereModel.UserId = asModel.UserId;
@@ -103,27 +107,25 @@ module.exports = {
     },
     /**
      * 更新打卡备注
-     * @param  模型实体  Attendance 
+     * @param {Attendance} adModel 模型实体   
      */
     updateAttendance: function (adModel) {
+        console.log(`[打卡备注] 更新打卡备注 adModel:${JSON.stringify(adModel)}`);
         let updateModel = disposeAttendanceModel(adModel);
         let whereModel = {
             AttendanceId: adModel.AttendanceId
         }
         Attendance.update(updateModel, {
             where: whereModel
-        }).then(result => {
-            console.log(result);
-        }).catch(err => {
-            console.log(err);
         });
     },
     /**
-     * 修改考勤是否通过
-     * @param  考勤Id  attendanceId 
-     * @param  是否通过 isPass   
+     * 执行修改打卡备注通过
+     * @param {number} attendanceId 考勤Id   
+     * @param {boolean} isPass 是否通过    
      */
     editAttendanceIsPass: function (attendanceId, isPass) {
+        console.log(`[打卡备注] 执行修改打卡备注通过 attendanceId:${attendanceId},isPass:${isPass}`);
         let whereModel = {
             AttendanceId: attendanceId
         }
@@ -132,17 +134,13 @@ module.exports = {
         }
         Attendance.update(updateModel, {
             where: whereModel
-        }).then(result => {
-            console.log(result);
-        }).catch(err => {
-            console.log(err);
         });
     },
 
 };
 /**
  * 处理Attendance，拼接where条件
- * @param  模型实体  adModel 
+ * @param {Attendance} adModel 模型实体   
  */
 function disposeAttendanceModel(adModel) {
     let whereModel = {};

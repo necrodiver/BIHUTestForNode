@@ -5,6 +5,8 @@ const checkstr = require('../middlewares/checkstr');
 const serializeattendance = require('../middlewares/serializeattendance');
 const fs = require('fs');
 const multer = require('multer');
+const attendanceFilter = require('../modelfilter/month_in_usermark');
+const attendanceOperate = require('../operate/attendanceoperate');
 const upload = multer({
     dest: 'public/xls/'
 });
@@ -90,23 +92,24 @@ router.post('/EditMarkStatus', function (req, res, next) {
     res.send('操作打卡备注(增删改)');
 });
 ///获取打卡备注
-router.post('/UserMarkYearData', function (req, res, next) {
+router.post('/GetUserMarkData', attendanceFilter.monthInUserMarkFilter, function (req, res, next) {
     let msgModel = {
         MsgTitle: '获取打卡备注',
         MsgStatus: false,
         MsgContent: ''
     };
-    try {
-        let asModel = {
-            UserId: req.body.UserId,
-            UserName: req.body.UserName,
-            ClockYear: req.body.ClockYear
-        };
-        //let adList=
-    } catch (error) {
-        throw new Error(err);
-    }
-    res.send('获取用户打卡年记录');
+    let asModel = {
+        UserId: req.body.userId,
+        UserName: req.body.userName,
+        ClockYear: req.body.year
+    };
+    attendanceOperate.getUserMarks(asModel).then(function (result) {
+        msgModel.MsgContent = result;
+        msgModel.MsgStatus=true;
+        res.json(msgModel);
+    }).catch(function(err){
+        next(err);
+    });
 });
 
 
