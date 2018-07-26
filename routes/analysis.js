@@ -70,6 +70,8 @@ router.get('/GetMonthData', function (req, res, next) {
             msgModel.MsgContent = "查询数据不存在,你可以先进行操作等待考勤数据导入";
         } else {
             var excelJson = serializeattendance.getUserAllList(excelfileStr);
+            msgModel.MsgStatus = true;
+            msgModel.MsgContent = excelJson;
             console.log(excelJson);
         }
         return res.json(msgModel);
@@ -105,9 +107,9 @@ router.post('/GetUserMarkData', attendanceFilter.monthInUserMarkFilter, function
     };
     attendanceOperate.getUserMarks(asModel).then(function (result) {
         msgModel.MsgContent = result;
-        msgModel.MsgStatus=true;
+        msgModel.MsgStatus = true;
         res.json(msgModel);
-    }).catch(function(err){
+    }).catch(function (err) {
         next(err);
     });
 });

@@ -17,7 +17,7 @@ module.exports = {
         let userList = {};
         userNames.forEach(item => {
             let listChild = excelJson.filter(e => {
-                return e.UserName = item;
+                return e.UserName == item;
             });
             let thisUserList = this.DisPoseUser(listChild);
             userList[item] = thisUserList;
@@ -61,20 +61,20 @@ module.exports = {
         return lastData;
     },
     DisPoseUser: function (list1) {
-        let last = moment(list1[0].PunchCardTime, "YYYY/MM/DD hh:mm:ss");
+        let last = moment(list1[0].PunchCardTime, "YYYY/MM/DD HH:mm:ss");
         let days = last.daysInMonth();
         let userList = [];
         for (let i = 1; i <= days; i++) {
             let thisTime = null;
             let isRight = false;
-            let initDate = last.year() + '/' + last.month() + '/' + i;
-            let today = moment(initDate,"YYYY/MM/DD").weekday();
+            let initDate = last.year() + '/' + (last.month() + 1) + '/' + i;
+            let today = moment(initDate, "YYYY/MM/DD").weekday();
             for (let j = 0; j < list1.length; j++) {
-                if (moment(list1[j].PunchCardTime,"YYYY/MM/DD hh:mm:ss").get('D') == i) {
+                if (moment(list1[j].PunchCardTime, "YYYY/MM/DD HH:mm:ss").get('D') == i) {
                     isRight = true;
                     thisTime = list1[j].PunchCardTime;
                     var singleModel = userList.filter(u => {
-                        return u.putCaredTime == moment(list1[j].PunchCardTime,"YYYY/MM/DD hh:mm:ss").format('YYYY-MM-DD hh:mm:ss');
+                        return u.putCaredTime == moment(list1[j].PunchCardTime, "YYYY/MM/DD HH:mm:ss").format('YYYY-MM-DD HH:mm:ss');
                     });
                     if (singleModel && singleModel.length > 0) {
                         continue;
@@ -86,10 +86,10 @@ module.exports = {
                         continue;
                     }
                     if (isLastDay) {
-                        if (list1.length > j + 2 && moment(list1[j + 1].PunchCardTime,"YYYY/MM/DD hh:mm:ss").get('D') != i && moment(list1[j + 2].PunchCardTime,"YYYY/MM/DD hh:mm:ss").get('D') != i) {
+                        if (list1.length > j + 2 && moment(list1[j + 1].PunchCardTime, "YYYY/MM/DD HH:mm:ss").get('D') != i && moment(list1[j + 2].PunchCardTime, "YYYY/MM/DD HH:mm:ss").get('D') != i) {
                             userList.push({
                                 day: i,
-                                putCaredTime: moment('0001-01-01').format('YYYY-MM-DD hh:mm:ss'),
+                                putCaredTime: moment('0001-01-01').format('YYYY-MM-DD HH:mm:ss'),
                                 status: 0,
                                 isLeftTime: null,
                                 dayOfWeek: today
@@ -103,7 +103,7 @@ module.exports = {
                 if (today == 0) {
                     userList.push({
                         day: i,
-                        putCaredTime: moment('0001-01-01',"YYYY/MM/DD").format('YYYY-MM-DD hh:mm:ss'),
+                        putCaredTime: moment('0001-01-01', "YYYY/MM/DD").format('YYYY-MM-DD HH:mm:ss'),
                         status: 100,
                         isLeftTime: null,
                         dayOfWeek: 7
@@ -111,7 +111,7 @@ module.exports = {
                 } else if (this.IsHolidayByDateSix(last.add(1 - last.get('D'), 'day').add(i - 1, 'day'))) {
                     userList.push({
                         day: i,
-                        putCaredTime: moment('0001-01-01',"YYYY/MM/DD").format('YYYY-MM-DD hh:mm:ss'),
+                        putCaredTime: moment('0001-01-01', "YYYY/MM/DD").format('YYYY-MM-DD HH:mm:ss'),
                         status: 100,
                         isLeftTime: null,
                         dayOfWeek: 6
@@ -119,7 +119,7 @@ module.exports = {
                 } else if (this.IsHolidayByDate(last.add(1 - last.get('D'), 'day').add(i - 1, 'day'))) {
                     userList.push({
                         day: i,
-                        putCaredTime: moment('0001-01-01',"YYYY/MM/DD").format('YYYY-MM-DD hh:mm:ss'),
+                        putCaredTime: moment('0001-01-01', "YYYY/MM/DD").format('YYYY-MM-DD HH:mm:ss'),
                         status: 100,
                         isLeftTime: null,
                         dayOfWeek: today
@@ -127,17 +127,17 @@ module.exports = {
                 } else {
                     userList.push({
                         day: i,
-                        putCaredTime: moment('0001-01-01',"YYYY/MM/DD").format('YYYY-MM-DD hh:mm:ss'),
+                        putCaredTime: moment('0001-01-01', "YYYY/MM/DD").format('YYYY-MM-DD HH:mm:ss'),
                         status: 0,
                         isLeftTime: null,
                         dayOfWeek: today
                     });
                 }
             }
-            if (i == 1 && thisTime && moment(thisTime,"YYYY/MM/DD hh:mm:ss").hour() < 8 && moment(list1[i + 1].PunchCardTime,"YYYY/MM/DD hh:mm:ss").get('D') != i && moment(list1[i + 2].PunchCardTime,"YYYY/MM/DD hh:mm:ss").get('D') != i) {
+            if (i == 1 && thisTime && moment(thisTime, "YYYY/MM/DD HH:mm:ss").hour() < 8 && moment(list1[i + 1].PunchCardTime, "YYYY/MM/DD HH:mm:ss").get('D') != i && moment(list1[i + 2].PunchCardTime, "YYYY/MM/DD HH:mm:ss").get('D') != i) {
                 userList.push({
                     day: i,
-                    putCaredTime: moment('0001-01-01',"YYYY/MM/DD").format('YYYY-MM-DD hh:mm:ss'),
+                    putCaredTime: moment('0001-01-01', "YYYY/MM/DD").format('YYYY-MM-DD HH:mm:ss'),
                     status: 0,
                     isLeftTime: null,
                     dayOfWeek: today
@@ -149,7 +149,7 @@ module.exports = {
             if (!lastuserList || lastuserList.length <= 0) {
                 userList.push({
                     day: i,
-                    putCaredTime: moment('0001-01-01',"YYYY/MM/DD").format('YYYY-MM-DD hh:mm:ss'),
+                    putCaredTime: moment('0001-01-01', "YYYY/MM/DD").format('YYYY-MM-DD HH:mm:ss'),
                     status: 0,
                     isLeftTime: null,
                     dayOfWeek: today
@@ -172,7 +172,11 @@ module.exports = {
             } else {
                 userAll[key].status = 1;
             }
-            if (item.isLeftTime) {
+            if (item.isLeftTime == true) {
+                userAll[key].UserLeft = {};
+                userAll[key].UserLeft.putCaredTime = item.putCaredTime;
+                userAll[key].UserLeft.status = item.status;
+            } else if (item.isLeftTime == false) {
                 userAll[key].UserRight = {};
                 userAll[key].UserRight.putCaredTime = item.putCaredTime;
                 userAll[key].UserRight.status = item.status;
@@ -186,13 +190,13 @@ module.exports = {
     ProofTime: function (thisTime, today) {
         let isLastDay = false;
         let userModel = {};
-        let todayTime = moment(thisTime,"YYYY/MM/DD hh:mm:ss");
+        let todayTime = moment(thisTime, "YYYY/MM/DD HH:mm:ss");
         let day = todayTime.get('D');
         let hour = todayTime.hour();
         let minute = todayTime.minute();
         let dayOfWeek = parseInt(todayTime.weekday());
 
-        userModel.putCaredTime = todayTime.format('YYYY-MM-DD hh:mm:ss');
+        userModel.putCaredTime = todayTime.format('YYYY-MM-DD HH:mm:ss');
         userModel.day = day;
         userModel.dayOfWeek = today;
         if (hour >= 6 && hour < 14) {
@@ -258,10 +262,10 @@ module.exports = {
         if (month == 5 && (day == 12 || day == 26)) {
             return true;
         }
-        if (month == 6 && (day == 16 || day == 30)) {
+        if (month == 6 && (day == 9 || day == 16 || day == 30)) {
             return true;
         }
-        if (month == 7 && (day == 14 || day == 28)) {
+        if (month == 7 && (day == 1 || day == 8 || day == 14 || day == 15 || day == 22 || day == 28 || day == 29)) {
             return true;
         }
         if (month == 8 && (day == 11 || day == 25)) {
@@ -298,6 +302,9 @@ module.exports = {
                 return true;
             }
             if (month == 5 && day == 1) {
+                return true;
+            }
+            if (month == 6 && day == 18) {
                 return true;
             }
             if (month == 10 && (day >= 1 && day < 8)) {
