@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const helpers = require('../middlewares/heplers');
+const helpers = require('../middlewares/helpers');
 const checkstr = require('../middlewares/checkstr');
 const serializeattendance = require('../middlewares/serializeattendance');
 const fs = require('fs');
